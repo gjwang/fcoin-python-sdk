@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import hmac
 import hashlib
 import requests
@@ -105,14 +107,27 @@ class Fcoin():
         return self.signed_request('GET', 'accounts/balance')
 
     def list_orders(self, **payload):
-        """get orders"""
+        """get orders
+            查询参数
+            参数    默认值    描述
+            symbol          交易对
+            states          订单状态，多种状态联合查询：submitted,partial_filled,partial_canceled,filled,canceled,中间用逗号隔开
+            before          查询某个时间戳之前的订单
+            after           查询某个时间戳之后的订单
+            limit           每页的订单数量，默认为 20 条，最大100
+            account_type    杠杆：margin
+        """
         return self.signed_request('GET','orders', **payload)
+
+    def list_open_orders(self, symbol):
+        """get open orders"""
+        return self.list_orders(symbol=symbol, states="submitted,partial_filled")
 
     def create_order(self, **payload):
         """create order"""
         return self.signed_request('POST','orders', **payload)
 
-    def buy(self,symbol, price, amount):
+    def buy(self, symbol, price, amount):
         """buy someting"""
         return self.create_order(symbol=symbol, side='buy', type='limit', price=str(price), amount=amount)
 
